@@ -1,0 +1,109 @@
+<html>
+<head><title>Social Manager</title></head>
+<body>
+    <div x-data="{ activeTab: 'general' }" x-init="
+        if (!config.default_platforms) config.default_platforms = '';
+        if (config.adapt_content === undefined) config.adapt_content = true;
+        if (!config.content_preferences) config.content_preferences = {};
+        if (config.content_preferences.add_hashtags === undefined) config.content_preferences.add_hashtags = true;
+        if (!config.content_preferences.max_hashtags) config.content_preferences.max_hashtags = 5;
+        if (config.content_preferences.include_platform_handles === undefined) config.content_preferences.include_platform_handles = false;
+        if (!config.schedule) config.schedule = {};
+        if (!config.schedule.timezone) config.schedule.timezone = 'UTC';
+    ">
+        <template x-if="config">
+            <div>
+                <!-- Tab Navigation -->
+                <div style="display: flex; gap: 0; border-bottom: 2px solid var(--border-color, #e0e0e0); margin-bottom: 16px;">
+                    <template x-for="tab in ['general', 'content', 'schedule']">
+                        <button @click="activeTab = tab"
+                            :style="'padding: 8px 16px; border: none; background: none; cursor: pointer; font-size: 12px; font-weight: 600; margin-bottom: -2px; color: ' + (activeTab === tab ? '#6366F1' : 'var(--text-secondary, #888)') + '; border-bottom: 2px solid ' + (activeTab === tab ? '#6366F1' : 'transparent')"
+                            x-text="tab.charAt(0).toUpperCase() + tab.slice(1)"></button>
+                    </template>
+                </div>
+
+                <!-- General Tab -->
+                <div x-show="activeTab === 'general'">
+                    <div class="section-description">Need help? See the <a href="https://github.com/spinnakergit/a0-social-manager/blob/main/docs/SETUP.md" target="_blank" style="color: #6366F1;">Setup Guide</a> for step-by-step instructions.</div>
+
+                    <div class="section-title">Platform Selection</div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Default Platforms</div>
+                            <div class="field-description">Comma-separated list of platforms to post to by default (e.g., bluesky,x,linkedin). Leave empty for all available.</div>
+                        </div>
+                        <div class="field-control">
+                            <input type="text" x-model="config.default_platforms" placeholder="e.g. bluesky,x,linkedin (empty = all available)">
+                        </div>
+                    </div>
+
+                    <div class="section-title">Content Adaptation</div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Auto-adapt content</div>
+                            <div class="field-description">Automatically trim and format content for each platform's character limits.</div>
+                        </div>
+                        <div class="field-control">
+                            <label class="toggle"><input type="checkbox" x-model="config.adapt_content"><span class="toggler"></span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Tab -->
+                <div x-show="activeTab === 'content'">
+                    <div class="section-title">Hashtag Settings</div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Normalize hashtags</div>
+                            <div class="field-description">Automatically format and normalize hashtags across platforms.</div>
+                        </div>
+                        <div class="field-control">
+                            <label class="toggle"><input type="checkbox" x-model="config.content_preferences.add_hashtags"><span class="toggler"></span></label>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Max hashtags</div>
+                            <div class="field-description">Maximum number of hashtags to include per post (0-30).</div>
+                        </div>
+                        <div class="field-control">
+                            <input type="number" min="0" max="30" x-model.number="config.content_preferences.max_hashtags" style="width: 80px;">
+                        </div>
+                    </div>
+
+                    <div class="section-title">Mentions</div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Include platform-specific handles</div>
+                            <div class="field-description">Adapt @mentions to each platform's handle format (e.g., @user.bsky.social for Bluesky).</div>
+                        </div>
+                        <div class="field-control">
+                            <label class="toggle"><input type="checkbox" x-model="config.content_preferences.include_platform_handles"><span class="toggler"></span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Schedule Tab -->
+                <div x-show="activeTab === 'schedule'">
+                    <div class="section-title">Scheduling</div>
+
+                    <div class="field">
+                        <div class="field-label">
+                            <div class="field-title">Timezone</div>
+                            <div class="field-description">Timezone for scheduled posts (e.g., UTC, US/Eastern, Europe/London).</div>
+                        </div>
+                        <div class="field-control">
+                            <input type="text" x-model="config.schedule.timezone" placeholder="UTC" style="width: 200px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</body>
+</html>

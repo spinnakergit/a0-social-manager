@@ -1,0 +1,94 @@
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 16px;">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color, #e0e0e0);">
+        <h3 style="margin: 0; color: #6366F1;">Social Media Manager</h3>
+        <span data-sm="status-badge" style="padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; background: #fff3e0; color: #e65100;">Loading...</span>
+    </div>
+
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+        <button data-sm="refresh-btn" onclick="window._smMain.refreshStatus()" style="background: #6366F1; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px;">Refresh Status</button>
+    </div>
+
+    <div data-sm="platform-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px;"></div>
+
+    <div data-sm="summary" style="font-size: 12px; color: var(--text-secondary, #888); margin-top: 8px;"></div>
+</div>
+
+<script>
+(function() {
+    function fetchApi(url, opts) { return (globalThis.fetchApi || fetch)(url, opts); }
+    var API_TEST = '/api/plugins/social_manager/social_manager_test';
+
+    function $(sel) { return document.querySelector('[data-sm="' + sel + '"]'); }
+
+    function platformBadge(p) {
+        var color, bg, label;
+        if (p.ready) {
+            color = '#2e7d32'; bg = '#e8f5e9'; label = 'Ready';
+        } else if (p.installed && p.enabled) {
+            color = '#e65100'; bg = '#fff3e0'; label = 'Not Configured';
+        } else if (p.installed) {
+            color = '#b71c1c'; bg = '#fce4ec'; label = 'Disabled';
+        } else {
+            color = '#616161'; bg = '#f5f5f5'; label = 'Not Installed';
+        }
+        return '<div style="border:1px solid var(--border-color,#e0e0e0);border-radius:6px;padding:10px;background:var(--bg-secondary,#fafafa);">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
+            '<strong style="font-size:13px;text-transform:capitalize;">' + p.platform + '</strong>' +
+            '<span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600;background:' + bg + ';color:' + color + ';">' + label + '</span>' +
+            '</div>' +
+            '<div style="font-size:11px;color:var(--text-secondary,#888);">Plugin: ' + p.platform + '</div>' +
+            '</div>';
+    }
+
+    async function refreshStatus() {
+        var badge = $('status-badge');
+        var grid = $('platform-grid');
+        var summary = $('summary');
+        badge.textContent = 'Checking...';
+        badge.style.background = '#fff3e0';
+        badge.style.color = '#e65100';
+        try {
+            var resp = await fetchApi(API_TEST, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: '{}'
+            });
+            var data = await resp.json();
+            if (data.ok) {
+                var readyCount = data.ready_count || 0;
+                var total = data.total_platforms || 0;
+                if (readyCount > 0) {
+                    badge.textContent = readyCount + '/' + total + ' Ready';
+                    badge.style.background = '#e8f5e9';
+                    badge.style.color = '#2e7d32';
+                } else {
+                    badge.textContent = 'No Platforms Ready';
+                    badge.style.background = '#fce4ec';
+                    badge.style.color = '#c62828';
+                }
+                var html = '';
+                (data.platforms || []).forEach(function(p) {
+                    html += platformBadge(p);
+                });
+                grid.innerHTML = html;
+                summary.textContent = data.installed_count + ' installed, ' + readyCount + ' ready of ' + total + ' supported platforms.';
+            } else {
+                badge.textContent = data.error || 'Error';
+                badge.style.background = '#fce4ec';
+                badge.style.color = '#c62828';
+                grid.innerHTML = '';
+                summary.textContent = '';
+            }
+        } catch (e) {
+            badge.textContent = 'API unavailable';
+            badge.style.background = '#fce4ec';
+            badge.style.color = '#c62828';
+            grid.innerHTML = '';
+            summary.textContent = '';
+        }
+    }
+
+    window._smMain = { refreshStatus: refreshStatus };
+    setTimeout(refreshStatus, 50);
+})();
+</script>

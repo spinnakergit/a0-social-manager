@@ -1,0 +1,9 @@
+name: social_manager
+title: Social Media Manager
+description: "Cross-platform social media management — schedule, publish, monitor, and analyze across all connected platforms."
+version: 1.0.0
+settings_sections:
+  - external
+per_project_config: true
+per_agent_config: true
+always_enabled: false

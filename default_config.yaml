@@ -1,0 +1,18 @@
+# Social Media Manager — Default Configuration
+# These values are used when no config.json exists yet.
+
+# Default platforms to post to. Empty list = post to all available.
+default_platforms: []
+
+# Whether to auto-adapt content for each platform's character limits.
+adapt_content: true
+
+# Content adaptation preferences
+content_preferences:
+  add_hashtags: true
+  max_hashtags: 5
+  include_platform_handles: false
+
+# Scheduling settings
+schedule:
+  timezone: "UTC"

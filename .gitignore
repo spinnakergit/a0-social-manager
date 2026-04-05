@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Data (runtime state, not source)
+data/
+
+# Config with credentials
+config.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Toggle state (runtime, not source)
+.toggle-*
+
+# Environment
+.env
+.env.*
