@@ -52,24 +52,10 @@ fi
 mkdir -p "$PLUGIN_DIR/data"
 chmod 700 "$PLUGIN_DIR/data"
 
-SKILLS_DIR="$A0_ROOT/usr/skills"
-echo "Copying skills..."
-for skill_dir in "$SCRIPT_DIR/skills"/*/; do
-    skill_name="$(basename "$skill_dir")"
-    mkdir -p "$SKILLS_DIR/$skill_name"
-    cp -r "$skill_dir"* "$SKILLS_DIR/$skill_name/"
-done
-
 echo "Installing dependencies..."
 python3 "$PLUGIN_DIR/initialize.py" || python "$PLUGIN_DIR/initialize.py"
 
 touch "$PLUGIN_DIR/.toggle-1"
-
-if [ "$A0_ROOT" = "/a0" ] && [ -d "/git/agent-zero/usr" ]; then
-    GIT_PLUGIN="/git/agent-zero/usr/plugins/social_manager"
-    mkdir -p "$(dirname "$GIT_PLUGIN")"
-    cp -r "$PLUGIN_DIR" "$GIT_PLUGIN" 2>/dev/null || true
-fi
 
 echo ""
 echo "=== Installation complete ==="

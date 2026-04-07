@@ -60,21 +60,7 @@ def install(**kwargs):
             json.dump({}, f)
         print(f"[{plugin_name}] Created config.json with 0o600 permissions")
 
-    # 3. Install skills
-    skills_src = plugin_dir / "skills"
-    skills_dst = a0_root / "usr" / "skills"
-    if skills_src.is_dir():
-        for skill_dir in skills_src.iterdir():
-            if skill_dir.is_dir():
-                target = skills_dst / skill_dir.name
-                target.mkdir(parents=True, exist_ok=True)
-                for f in skill_dir.iterdir():
-                    dest = target / f.name
-                    if f.is_file():
-                        dest.write_bytes(f.read_bytes())
-                print(f"[{plugin_name}] Installed skill: {skill_dir.name}")
-
-    # 4. Install Python dependencies via initialize.py
+    # 3. Install Python dependencies via initialize.py
     init_script = plugin_dir / "initialize.py"
     if init_script.is_file():
         python = _find_python()
@@ -92,16 +78,6 @@ def install(**kwargs):
         except subprocess.TimeoutExpired:
             print(f"[{plugin_name}] Warning: dependency install timed out")
 
-    # 5. Mirror to /git/agent-zero if running in /a0 runtime
-    if str(a0_root) == "/a0" and Path("/git/agent-zero/usr").is_dir():
-        git_plugin = Path("/git/agent-zero/usr/plugins") / plugin_name
-        if not git_plugin.exists():
-            try:
-                import shutil
-                shutil.copytree(str(plugin_dir), str(git_plugin))
-            except Exception:
-                pass
-
     print(f"[{plugin_name}] Post-install hook complete")
 
 
@@ -111,15 +87,5 @@ def uninstall(**kwargs):
     plugin_name = "social_manager"
 
     print(f"[{plugin_name}] Running uninstall hook...")
-
-
-    # Remove skills
-    skills_dst = a0_root / "usr" / "skills"
-    for skill_name in ['social-manager-campaign', 'social-manager-monitor', 'social-manager-publish']:
-        skill_path = skills_dst / skill_name
-        if skill_path.is_dir():
-            import shutil
-            shutil.rmtree(str(skill_path))
-            print(f"[{plugin_name}] Removed skill: {skill_name}")
 
     print(f"[{plugin_name}] Uninstall hook complete")
